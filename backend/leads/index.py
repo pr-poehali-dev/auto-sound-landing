@@ -10,43 +10,46 @@ def send_email_notification(phone: str) -> None:
     '''
     Sends email notification about new lead
     '''
-    smtp_host = os.environ.get('SMTP_HOST')
-    smtp_port = os.environ.get('SMTP_PORT', '587')
-    smtp_user = os.environ.get('SMTP_USER')
-    smtp_password = os.environ.get('SMTP_PASSWORD')
-    notification_email = os.environ.get('NOTIFICATION_EMAIL')
-    
-    if not all([smtp_host, smtp_user, smtp_password, notification_email]):
-        return
-    
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = '🚗 Новая заявка на прайс-лист!'
-    msg['From'] = smtp_user
-    msg['To'] = notification_email
-    
-    html = f'''
-    <html>
-      <body style="font-family: Arial, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a1a1a 0%, #8b0000 100%); padding: 30px; border-radius: 10px;">
-          <h2 style="color: #FFD700; margin: 0 0 20px 0;">🎯 Новый потенциальный клиент!</h2>
-          <div style="background: white; padding: 20px; border-radius: 8px;">
-            <p style="font-size: 18px; color: #333; margin: 10px 0;">
-              <strong>Телефон:</strong> <span style="color: #8b0000; font-size: 20px;">{phone}</span>
-            </p>
-            <p style="color: #666; margin: 10px 0;">Клиент скачал прайс-лист и готов к обсуждению!</p>
-          </div>
-        </div>
-      </body>
-    </html>
-    '''
-    
-    part = MIMEText(html, 'html', 'utf-8')
-    msg.attach(part)
-    
-    with smtplib.SMTP(smtp_host, int(smtp_port)) as server:
-        server.starttls()
-        server.login(smtp_user, smtp_password)
-        server.send_message(msg)
+    try:
+        smtp_host = os.environ.get('SMTP_HOST')
+        smtp_port = os.environ.get('SMTP_PORT', '587')
+        smtp_user = os.environ.get('SMTP_USER')
+        smtp_password = os.environ.get('SMTP_PASSWORD')
+        notification_email = os.environ.get('NOTIFICATION_EMAIL')
+        
+        if not all([smtp_host, smtp_user, smtp_password, notification_email]):
+            return
+        
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = '🚗 Новая заявка на прайс-лист!'
+        msg['From'] = smtp_user
+        msg['To'] = notification_email
+        
+        html = f'''
+        <html>
+          <body style="font-family: Arial, sans-serif;">
+            <div style="background: linear-gradient(135deg, #1a1a1a 0%, #8b0000 100%); padding: 30px; border-radius: 10px;">
+              <h2 style="color: #FFD700; margin: 0 0 20px 0;">🎯 Новый потенциальный клиент!</h2>
+              <div style="background: white; padding: 20px; border-radius: 8px;">
+                <p style="font-size: 18px; color: #333; margin: 10px 0;">
+                  <strong>Телефон:</strong> <span style="color: #8b0000; font-size: 20px;">{phone}</span>
+                </p>
+                <p style="color: #666; margin: 10px 0;">Клиент скачал прайс-лист и готов к обсуждению!</p>
+              </div>
+            </div>
+          </body>
+        </html>
+        '''
+        
+        part = MIMEText(html, 'html', 'utf-8')
+        msg.attach(part)
+        
+        with smtplib.SMTP(smtp_host, int(smtp_port)) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.send_message(msg)
+    except Exception:
+        pass
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
