@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "name": "Save phone number",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "phone": "+79991234567"
+      },
+      "expectedStatus": 201
+    },
+    {
+      "name": "Get all leads",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

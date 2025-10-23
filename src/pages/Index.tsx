@@ -13,47 +13,38 @@ const Index = () => {
     setIsModalOpen(true);
   };
 
-  const handlePhoneSubmit = (e: React.FormEvent) => {
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length < 10) {
       toast.error('Пожалуйста, введите корректный номер телефона');
       return;
     }
 
-    const wb = {
-      SheetNames: ['Прайс-лист'],
-      Sheets: {
-        'Прайс-лист': {
-          A1: { v: 'Название товара' },
-          B1: { v: 'Артикул' },
-          C1: { v: 'Цена (руб.)' },
-          A2: { v: 'Динамики автомобильные 16см' },
-          B2: { v: 'SPK-16-001' },
-          C2: { v: '2500' },
-          A3: { v: 'Сабвуфер 30см' },
-          B3: { v: 'SUB-30-002' },
-          C3: { v: '8900' },
-          A4: { v: 'Усилитель 4-канальный' },
-          B4: { v: 'AMP-4CH-003' },
-          C4: { v: '12500' },
-          A5: { v: 'Магнитола 2DIN' },
-          B5: { v: 'HU-2DIN-004' },
-          C5: { v: '15000' },
-          '!ref': 'A1:C5'
-        }
+    try {
+      const response = await fetch('https://functions.poehali.dev/3a2adb39-a24e-4187-a6de-3bd8be89e3c2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save phone');
       }
-    };
 
-    const csv = 'Название товара;Артикул;Цена (руб.)\nДинамики автомобильные 16см;SPK-16-001;2500\nСабвуфер 30см;SUB-30-002;8900\nУсилитель 4-канальный;AMP-4CH-003;12500\nМагнитола 2DIN;HU-2DIN-004;15000';
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'price_list.csv';
-    link.click();
+      const priceListUrl = '/price_list.xlsx';
+      const link = document.createElement('a');
+      link.href = priceListUrl;
+      link.download = 'price_list.xlsx';
+      link.click();
 
-    toast.success('Прайс-лист отправлен на скачивание!');
-    setIsModalOpen(false);
-    setPhone('');
+      toast.success('Прайс-лист отправлен на скачивание!');
+      setIsModalOpen(false);
+      setPhone('');
+    } catch (error) {
+      toast.error('Ошибка при сохранении данных');
+    }
   };
 
   return (
